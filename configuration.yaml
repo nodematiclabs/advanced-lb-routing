@@ -1,0 +1,49 @@
+defaultService: projects/cloud-load-balancing/global/backendServices/base
+name: example
+routeRules:
+- urlRedirect:
+    stripQuery: true
+    hostRedirect: example.com
+  matchRules:
+  - prefixMatch: /redirect
+  priority: 0
+- matchRules:
+  - prefixMatch: /one
+  priority: 1
+  routeAction:
+    weightedBackendServices:
+    - backendService: projects/cloud-load-balancing/global/backendServices/one
+      weight: 100
+    urlRewrite:
+      hostRewrite: one
+- matchRules:
+  - prefixMatch: /two
+  priority: 2
+  routeAction:
+    weightedBackendServices:
+    - backendService: projects/cloud-load-balancing/global/backendServices/two
+      weight: 100
+    urlRewrite:
+      hostRewrite: two
+- matchRules:
+  - prefixMatch: /subfolder/
+  priority: 3
+  routeAction:
+    weightedBackendServices:
+    - backendService: projects/cloud-load-balancing/global/backendServices/one
+      weight: 100
+    urlRewrite:
+      pathPrefixRewrite: /
+      hostRewrite: one
+- matchRules:
+  - prefixMatch: /
+    queryParameterMatches:
+    - name: "user"
+      presentMatch: true
+  priority: 4
+  routeAction:
+    weightedBackendServices:
+    - backendService: projects/cloud-load-balancing/global/backendServices/two
+      weight: 100
+    urlRewrite:
+      hostRewrite: two
